@@ -17,7 +17,7 @@ export const issuesQuery = queryOptions({
   },
 });
 
-export const Route = createFileRoute("/_authenticated/console/")({
+export const Route = createFileRoute("/_authenticated/console/qa")({
   loader: ({ context }) => context.queryClient.ensureQueryData(issuesQuery),
   component: Operations,
 });
