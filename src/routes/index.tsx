@@ -1,24 +1,35 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Razul — Private Observer Console" },
+      { name: "description", content: "Owner and invitation-only console for Razul, the game development QA observer." },
+      { property: "og:title", content: "Razul — Private Observer Console" },
+      { property: "og:description", content: "Owner and invitation-only console for Razul, the game development QA observer." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="flex min-h-screen items-center justify-center px-6">
+      <div className="w-full max-w-lg rounded-lg border bg-card p-8">
+        <p className="label-mono">Restricted system · invitation only</p>
+        <h1 className="mt-3 text-3xl font-bold">Razul</h1>
+        <p className="text-lg text-primary">Game Development Observer</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Private QA console for reviewing authorized game-test evidence. Access requires an owner-issued invitation.
+        </p>
+        <div className="mt-6 flex gap-3">
+          <Button asChild><Link to="/auth">Sign in</Link></Button>
+          <Button asChild variant="outline"><Link to="/console">Open console</Link></Button>
+        </div>
+      </div>
+    </main>
   );
 }
