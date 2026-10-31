@@ -43,7 +43,7 @@ function Operations() {
       generated_at: new Date().toISOString(),
       source: "Razul — Game Development Observer (manual review)",
       note: "Manually logged issues only. No automated telemetry analysis included.",
-      issues: queue.map(({ reported_by: _r, ...i }) => i),
+      issues: queue.map(({ reported_by: _r, agent_id: _a, ...i }) => i),
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
@@ -55,8 +55,8 @@ function Operations() {
     <div className="space-y-8">
       <section className="grid gap-4 md:grid-cols-3">
         <StatusCard label="Manual review" value="Active" tone="success" detail="Issue logging & evidence references are live." />
-        <StatusCard label="Telemetry ingest" value="Not connected" tone="offline" detail="No machine endpoint accepts data yet." />
-        <StatusCard label="Automated analysis" value="Planned" tone="offline" detail="No autonomous monitoring is running." />
+        <StatusCard label="Agent API (this hub)" value="Live" tone="success" detail="Granted agents can read/report issues with their own credential." />
+        <StatusCard label="Automated analysis" value="Planned" tone="offline" detail="No autonomous telemetry analysis runs; agents report what they observe." />
       </section>
 
       <section className="rounded-lg border bg-card">
@@ -84,7 +84,7 @@ function Operations() {
               <li key={i.id}>
                 <Link to="/console/issues/$issueId" params={{ issueId: i.id }} className="flex flex-wrap items-center gap-3 p-4 hover:bg-muted">
                   <SeverityBadge s={i.severity} />
-                  <span className="font-medium">{i.title}</span>
+                  <span className="font-medium">{i.title}</span>{i.source === "agent" && <span className="label-mono text-primary">agent</span>}
                   <span className="label-mono">{categoryLabel(i.category)}</span>
                   <span className="ml-auto font-mono text-xs text-muted-foreground">{i.build_version} · {i.status.replace("_", " ")}</span>
                 </Link>

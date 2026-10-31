@@ -31,7 +31,7 @@ function ConsoleLayout() {
   const nav = [
     { to: "/console", label: "Operations" },
     { to: "/console/integrations", label: "Integrations" },
-    ...(access.isOwner ? [{ to: "/console/team", label: "Access control" }] : []),
+    ...(access.isOwner ? [{ to: "/console/agents", label: "Agents" }, { to: "/console/team", label: "Human access" }] : []),
   ] as const;
   return (
     <div className="min-h-screen">

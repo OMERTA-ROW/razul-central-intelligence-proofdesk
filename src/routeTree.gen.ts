@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedConsoleRouteImport } from './routes/_authenticated/console'
 import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
+import { Route as AuthenticatedConsoleAgentsRouteImport } from './routes/_authenticated/console.agents'
 import { Route as AuthenticatedConsoleIntegrationsRouteImport } from './routes/_authenticated/console.integrations'
 import { Route as AuthenticatedConsoleTeamRouteImport } from './routes/_authenticated/console.team'
 import { Route as AuthenticatedConsoleIssuesIssueIdRouteImport } from './routes/_authenticated/console.issues.$issueId'
@@ -56,6 +57,12 @@ const AuthenticatedConsoleIndexRoute =
   AuthenticatedConsoleIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => AuthenticatedConsoleRoute,
+  } as any)
+const AuthenticatedConsoleAgentsRoute =
+  AuthenticatedConsoleAgentsRouteImport.update({
+    id: '/agents',
+    path: '/agents',
     getParentRoute: () => AuthenticatedConsoleRoute,
   } as any)
 const AuthenticatedConsoleIntegrationsRoute =
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/console': typeof AuthenticatedConsoleRouteWithChildren
   '/invite': typeof AuthenticatedInviteRoute
+  '/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
   '/console/team': typeof AuthenticatedConsoleTeamRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
@@ -112,6 +120,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/invite': typeof AuthenticatedInviteRoute
+  '/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
   '/console/team': typeof AuthenticatedConsoleTeamRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
@@ -128,6 +137,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/console': typeof AuthenticatedConsoleRouteWithChildren
   '/_authenticated/invite': typeof AuthenticatedInviteRoute
+  '/_authenticated/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/_authenticated/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
   '/_authenticated/console/team': typeof AuthenticatedConsoleTeamRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/console'
     | '/invite'
+    | '/console/agents'
     | '/console/integrations'
     | '/console/team'
     | '/console/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/invite'
+    | '/console/agents'
     | '/console/integrations'
     | '/console/team'
     | '/console'
@@ -172,6 +184,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/console'
     | '/_authenticated/invite'
+    | '/_authenticated/console/agents'
     | '/_authenticated/console/integrations'
     | '/_authenticated/console/team'
     | '/_authenticated/console/'
@@ -242,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
       parentRoute: typeof AuthenticatedConsoleRoute
     }
+    '/_authenticated/console/agents': {
+      id: '/_authenticated/console/agents'
+      path: '/agents'
+      fullPath: '/console/agents'
+      preLoaderRoute: typeof AuthenticatedConsoleAgentsRouteImport
+      parentRoute: typeof AuthenticatedConsoleRoute
+    }
     '/_authenticated/console/integrations': {
       id: '/_authenticated/console/integrations'
       path: '/integrations'
@@ -288,6 +308,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedConsoleRouteChildren {
+  AuthenticatedConsoleAgentsRoute: typeof AuthenticatedConsoleAgentsRoute
   AuthenticatedConsoleIntegrationsRoute: typeof AuthenticatedConsoleIntegrationsRoute
   AuthenticatedConsoleTeamRoute: typeof AuthenticatedConsoleTeamRoute
   AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
@@ -295,6 +316,7 @@ interface AuthenticatedConsoleRouteChildren {
 }
 
 const AuthenticatedConsoleRouteChildren: AuthenticatedConsoleRouteChildren = {
+  AuthenticatedConsoleAgentsRoute: AuthenticatedConsoleAgentsRoute,
   AuthenticatedConsoleIntegrationsRoute: AuthenticatedConsoleIntegrationsRoute,
   AuthenticatedConsoleTeamRoute: AuthenticatedConsoleTeamRoute,
   AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
