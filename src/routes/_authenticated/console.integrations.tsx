@@ -1,57 +1,43 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { INTEGRATIONS } from "@/lib/razul";
-import { Button } from "@/components/ui/button";
+import { getConnectionReadiness } from "@/lib/razul.functions";
 
-export const Route = createFileRoute("/_authenticated/console/integrations")({
-  component: Integrations,
-});
-
-const contractDoc = {
-  schema: "razul.integration-contract.v1",
-  status: "draft — no endpoint live",
-  auth: {
-    human: "Email/password session (owner/reviewer roles), separate from machines",
-    machine: "Bearer service credential `rzl_…` (SHA-256 hashed at rest, scoped, expiring, revocable by owner)",
-    scopes: ["evidence:write", "telemetry:write", "issues:read", "issues:write"],
-  },
-  planned_endpoints: [
-    { method: "POST", path: "/api/public/razul/evidence", scope: "evidence:write", body: { build_version: "string", session_id: "string", category: "issue_category", evidence_ref: "string", captured_at: "ISO-8601", notes: "string?" } },
-    { method: "POST", path: "/api/public/razul/telemetry", scope: "telemetry:write", body: { build_version: "string", session_id: "string", samples: [{ t: "ms", frame_ms: "number", net_rtt_ms: "number?", state_hash: "string?" }] } },
-    { method: "GET", path: "/api/public/razul/issues?status=triaged", scope: "issues:read" },
-    { method: "PATCH", path: "/api/public/razul/issues/:id/status", scope: "issues:write", body: { status: "fixed | verified" } },
-  ],
-  systems: INTEGRATIONS,
-};
+export const Route = createFileRoute("/_authenticated/console/integrations")({ component: Integrations });
 
 function Integrations() {
-  function download() {
-    const url = URL.createObjectURL(new Blob([JSON.stringify(contractDoc, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a"); a.href = url; a.download = "razul-integration-contract.json"; a.click(); URL.revokeObjectURL(url);
-  }
+  const fn = useServerFn(getConnectionReadiness);
+  const { data } = useQuery({ queryKey: ["readiness"], queryFn: () => fn() });
+  const status = (id: string, h: string) => {
+    if (h === "live") return ["Live", "text-success"];
+    if (id === "jackboy" && data?.jackboy.baseUrl && data.jackboy.ingestToken) return ["Configured — untested until first relay", "text-warning"];
+    if (h === "defined_needs_secrets") return ["Handshake exists — credentials pending", "text-warning"];
+    return ["No handshake — not connected", "text-offline"];
+  };
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Integration readiness</h1>
-          <p className="text-sm text-muted-foreground">No external system is connected. These are documented contracts only.</p>
-        </div>
-        <Button className="ml-auto" variant="outline" onClick={download}>Download contract JSON</Button>
+      <div>
+        <h1 className="text-2xl font-bold">Project access readiness</h1>
+        <p className="text-sm text-muted-foreground">Based on read-only inspection of each project. No other project was modified.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        {INTEGRATIONS.map((s) => (
-          <div key={s.id} className="rounded-lg border bg-card p-5">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-offline" />
+        {INTEGRATIONS.map((s) => {
+          const [label, tone] = status(s.id, s.handshake);
+          return (
+            <div key={s.id} className="rounded-lg border bg-card p-5">
               <h2 className="font-semibold">{s.name}</h2>
-              <span className="ml-auto rounded border px-2 py-0.5 font-mono text-[10px] uppercase text-offline">Disconnected</span>
+              <p className="font-mono text-xs text-muted-foreground">{s.ref}</p>
+              <p className={`mt-2 text-sm font-semibold ${tone}`}>{label}</p>
+              {s.id === "jackboy" && data && (
+                <p className="font-mono text-xs text-muted-foreground">JACKBOY_BASE_URL: {data.jackboy.baseUrl ? "set" : "missing"} · JACKBOY_INGEST_TOKEN: {data.jackboy.ingestToken ? "set" : "missing"}</p>
+              )}
+              <p className="mt-3 text-sm text-muted-foreground">{s.finding}</p>
+              <p className="label-mono mt-4 mb-1">Pending prerequisites</p>
+              <ul className="space-y-1 text-sm text-muted-foreground">{s.prerequisites.map((p) => <li key={p}>☐ {p}</li>)}</ul>
             </div>
-            <p className="mt-1 font-mono text-xs text-muted-foreground">{s.ref}</p>
-            <p className="mt-3 text-sm">{s.direction}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{s.contract}</p>
-            <p className="label-mono mt-4 mb-1">Prerequisites</p>
-            <ul className="space-y-1 text-sm text-muted-foreground">{s.prerequisites.map((p) => <li key={p}>☐ {p}</li>)}</ul>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
