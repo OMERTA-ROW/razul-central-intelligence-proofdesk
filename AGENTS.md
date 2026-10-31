@@ -10,9 +10,9 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Roles live only in `public.user_roles` (owner/reviewer); all access is enforced by RLS + `has_role`/`is_member`, never by client checks — UI gating is cosmetic.
+- Human access is owner-only: `is_member` = owner; invitations/`redeem_invitation` are deprecated and disabled. All access is enforced by RLS, never client checks.
 - Owner bootstrap is one-time via `claimOwner` server fn, gated on the `RAZUL_OWNER_EMAIL` secret, a confirmed email, and no existing owner — never grant owner any other way.
-- Invitations are reviewer-only, single-use, email-bound, SHA-256-hashed tokens redeemed through the `redeem_invitation` security-definer RPC.
+- Agent roles (sentinel/angeltech/demontech) gate role-reserved scopes in both `agent-policy.ts` and the `check_grant_duties` DB trigger; keep them in sync. Memory lives in `knowledge_entries` (research requires sources); dispatch lives in `agent_tasks` (agents pull their own tasks and may only report if they hold the task scope).
 - Machine access = per-agent identities (`agents`) with their own hashed, expiring, revocable `rza_` credentials and per-project `agent_grants` (target + scopes + expiry); every agent API call goes through `authenticateAgent` in `src/lib/agent-auth.server.ts` and is written to `agent_audit`. Policy lives in `src/lib/agent-policy.ts` (tested). Dev scopes require the `developer` duty (DB trigger + policy). `service_credentials` is deprecated.
 - Cross-project access only through a handshake the other project already exposes (e.g. Jackboy `/api/public/agent-ingest` with a Jackboy-issued token stored as a secret here); never modify other projects from here.
 - External systems (Anomaly Legacy, Jackboy, OMNI, Guardian) are shown as disconnected contracts in `src/lib/razul.ts`; never display fabricated telemetry or claim a connection without a live, verified integration.
