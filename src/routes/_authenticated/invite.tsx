@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/invite")({
-  validateSearch: (s: Record<string, unknown>) => ({ token: typeof s.token === "string" ? s.token : "" }),
+  validateSearch: (s: Record<string, unknown>) => ({ token: typeof s["token"] === "string" ? s["token"] : "" }),
   head: () => ({ meta: [{ title: "Accept invitation — Razul Console" }, { name: "description", content: "Accept an invitation to Razul's console." }] }),
   component: InvitePage,
 });
@@ -31,7 +31,8 @@ function InvitePage() {
     setBusy(false);
     if (error) {
       const key = Object.keys(messages).find((k) => error.message.includes(k));
-      return toast.error(key ? messages[key] : error.message);
+      toast.error(key ? messages[key] : error.message);
+      return;
     }
     toast.success("Invitation accepted. Welcome to Razul's console.");
     await qc.invalidateQueries({ queryKey: ["access"] });
