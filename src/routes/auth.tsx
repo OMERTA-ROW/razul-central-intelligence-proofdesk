@@ -46,7 +46,7 @@ function AuthPage() {
           email, password, options: { emailRedirectTo: window.location.origin + target },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account. Access still requires an invitation or owner bootstrap.");
+        toast.success("Check your email to confirm your account. Only the configured owner email can claim access.");
         setMode("signin");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
@@ -86,7 +86,7 @@ function AuthPage() {
             <button type="button" onClick={() => setMode("signin")}>Back to sign in</button>
           ) : (
             <>
-              <button type="button" onClick={() => setMode("signup")}>Have an invitation? Create account</button>
+              <button type="button" onClick={() => setMode("signup")}>Owner first-time setup</button>
               <button type="button" onClick={() => setMode("forgot")}>Forgot password</button>
             </>
           )}

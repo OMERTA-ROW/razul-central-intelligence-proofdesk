@@ -47,25 +47,6 @@ export const claimOwner = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const createInvitation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((i: { email: string }) => {
-    const email = String(i?.email ?? "").trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw new Error("Invalid email");
-    return { email };
-  })
-  .handler(async ({ data, context }) => {
-    const token = randomToken();
-    const { error } = await context.supabase.from("invitations").insert({
-      email: data.email,
-      role: "reviewer",
-      token_hash: await sha256Hex(token),
-      invited_by: context.userId,
-    });
-    if (error) throw new Error("Only the owner can create invitations.");
-    return { token };
-  });
-
 export const issueAgentCredential = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: { agentId: string; days: number }) => {

@@ -132,6 +132,63 @@ export type Database = {
           },
         ]
       }
+      agent_tasks: {
+        Row: {
+          agent_id: string
+          created_at: string
+          created_by: string
+          id: string
+          instruction: string
+          required_scope: string
+          result: string | null
+          result_entry: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          target: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          instruction: string
+          required_scope: string
+          result?: string | null
+          result_entry?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          target: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          instruction?: string
+          required_scope?: string
+          result?: string | null
+          result_entry?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          target?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_tasks_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_tasks_result_entry_fkey"
+            columns: ["result_entry"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agents: {
         Row: {
           created_at: string
@@ -141,6 +198,7 @@ export type Database = {
           last_seen_at: string | null
           name: string
           purpose: string
+          role: Database["public"]["Enums"]["agent_role"]
           status: Database["public"]["Enums"]["agent_status"]
         }
         Insert: {
@@ -151,6 +209,7 @@ export type Database = {
           last_seen_at?: string | null
           name: string
           purpose?: string
+          role?: Database["public"]["Enums"]["agent_role"]
           status?: Database["public"]["Enums"]["agent_status"]
         }
         Update: {
@@ -161,6 +220,7 @@ export type Database = {
           last_seen_at?: string | null
           name?: string
           purpose?: string
+          role?: Database["public"]["Enums"]["agent_role"]
           status?: Database["public"]["Enums"]["agent_status"]
         }
         Relationships: []
@@ -203,6 +263,59 @@ export type Database = {
           token_hash?: string
         }
         Relationships: []
+      }
+      knowledge_entries: {
+        Row: {
+          agent_id: string | null
+          author_user: string | null
+          body: string
+          created_at: string
+          evidence: Database["public"]["Enums"]["evidence_class"]
+          id: string
+          kind: Database["public"]["Enums"]["knowledge_kind"]
+          occurred_at: string | null
+          project: string
+          sources: Json
+          tags: string[]
+          title: string
+        }
+        Insert: {
+          agent_id?: string | null
+          author_user?: string | null
+          body?: string
+          created_at?: string
+          evidence?: Database["public"]["Enums"]["evidence_class"]
+          id?: string
+          kind: Database["public"]["Enums"]["knowledge_kind"]
+          occurred_at?: string | null
+          project?: string
+          sources?: Json
+          tags?: string[]
+          title: string
+        }
+        Update: {
+          agent_id?: string | null
+          author_user?: string | null
+          body?: string
+          created_at?: string
+          evidence?: Database["public"]["Enums"]["evidence_class"]
+          id?: string
+          kind?: Database["public"]["Enums"]["knowledge_kind"]
+          occurred_at?: string | null
+          project?: string
+          sources?: Json
+          tags?: string[]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_entries_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       qa_issues: {
         Row: {
@@ -349,8 +462,16 @@ export type Database = {
       redeem_invitation: { Args: { _token: string }; Returns: string }
     }
     Enums: {
+      agent_role: "sentinel" | "angeltech" | "demontech"
       agent_status: "active" | "paused" | "revoked"
       app_role: "owner" | "reviewer"
+      evidence_class:
+        | "verified"
+        | "primary_source"
+        | "reported"
+        | "observed"
+        | "hypothesis"
+        | "historical"
       issue_category:
         | "animation_snapping"
         | "foot_sliding"
@@ -369,6 +490,19 @@ export type Database = {
         | "verified"
         | "wont_fix"
         | "duplicate"
+      knowledge_kind:
+        | "observation"
+        | "research"
+        | "history"
+        | "report"
+        | "decision"
+      task_status:
+        | "queued"
+        | "acknowledged"
+        | "in_progress"
+        | "reported"
+        | "failed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -496,8 +630,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_role: ["sentinel", "angeltech", "demontech"],
       agent_status: ["active", "paused", "revoked"],
       app_role: ["owner", "reviewer"],
+      evidence_class: [
+        "verified",
+        "primary_source",
+        "reported",
+        "observed",
+        "hypothesis",
+        "historical",
+      ],
       issue_category: [
         "animation_snapping",
         "foot_sliding",
@@ -517,6 +660,21 @@ export const Constants = {
         "verified",
         "wont_fix",
         "duplicate",
+      ],
+      knowledge_kind: [
+        "observation",
+        "research",
+        "history",
+        "report",
+        "decision",
+      ],
+      task_status: [
+        "queued",
+        "acknowledged",
+        "in_progress",
+        "reported",
+        "failed",
+        "cancelled",
       ],
     },
   },

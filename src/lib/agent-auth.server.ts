@@ -31,7 +31,7 @@ export async function authenticateAgent(request: Request, action: string, requir
     return { error: deny(401, "Invalid, revoked or expired credential") };
   }
   const [{ data: agent }, { data: grants }] = await Promise.all([
-    db.from("agents").select("id, name, status, duties").eq("id", cred.agent_id).single(),
+    db.from("agents").select("id, name, status, duties, role").eq("id", cred.agent_id).single(),
     db.from("agent_grants").select("target, scopes, expires_at, revoked_at").eq("agent_id", cred.agent_id),
   ]);
   if (!agent) return { error: deny(401, "Unknown agent") };
