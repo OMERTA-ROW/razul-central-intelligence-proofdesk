@@ -14,13 +14,13 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedConsoleRouteImport } from './routes/_authenticated/console'
-import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
 import { Route as AuthenticatedConsoleAgentsRouteImport } from './routes/_authenticated/console.agents'
 import { Route as AuthenticatedConsoleIntegrationsRouteImport } from './routes/_authenticated/console.integrations'
-import { Route as AuthenticatedConsoleTeamRouteImport } from './routes/_authenticated/console.team'
 import { Route as AuthenticatedConsoleIssuesIssueIdRouteImport } from './routes/_authenticated/console.issues.$issueId'
 import { Route as ApiPublicAgentsV1IssuesRouteImport } from './routes/api/public/agents/v1/issues'
+import { Route as ApiPublicAgentsV1KnowledgeRouteImport } from './routes/api/public/agents/v1/knowledge'
+import { Route as ApiPublicAgentsV1TasksRouteImport } from './routes/api/public/agents/v1/tasks'
 import { Route as ApiPublicAgentsV1WhoamiRouteImport } from './routes/api/public/agents/v1/whoami'
 import { Route as ApiPublicAgentsV1RelayJackboyRouteImport } from './routes/api/public/agents/v1/relay.jackboy'
 
@@ -48,11 +48,6 @@ const AuthenticatedConsoleRoute = AuthenticatedConsoleRouteImport.update({
   path: '/console',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedInviteRoute = AuthenticatedInviteRouteImport.update({
-  id: '/invite',
-  path: '/invite',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedConsoleIndexRoute =
   AuthenticatedConsoleIndexRouteImport.update({
     id: '/',
@@ -71,12 +66,6 @@ const AuthenticatedConsoleIntegrationsRoute =
     path: '/integrations',
     getParentRoute: () => AuthenticatedConsoleRoute,
   } as any)
-const AuthenticatedConsoleTeamRoute =
-  AuthenticatedConsoleTeamRouteImport.update({
-    id: '/team',
-    path: '/team',
-    getParentRoute: () => AuthenticatedConsoleRoute,
-  } as any)
 const AuthenticatedConsoleIssuesIssueIdRoute =
   AuthenticatedConsoleIssuesIssueIdRouteImport.update({
     id: '/issues/$issueId',
@@ -86,6 +75,17 @@ const AuthenticatedConsoleIssuesIssueIdRoute =
 const ApiPublicAgentsV1IssuesRoute = ApiPublicAgentsV1IssuesRouteImport.update({
   id: '/api/public/agents/v1/issues',
   path: '/api/public/agents/v1/issues',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAgentsV1KnowledgeRoute =
+  ApiPublicAgentsV1KnowledgeRouteImport.update({
+    id: '/api/public/agents/v1/knowledge',
+    path: '/api/public/agents/v1/knowledge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAgentsV1TasksRoute = ApiPublicAgentsV1TasksRouteImport.update({
+  id: '/api/public/agents/v1/tasks',
+  path: '/api/public/agents/v1/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicAgentsV1WhoamiRoute = ApiPublicAgentsV1WhoamiRouteImport.update({
@@ -105,13 +105,13 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/console': typeof AuthenticatedConsoleRouteWithChildren
-  '/invite': typeof AuthenticatedInviteRoute
   '/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
-  '/console/team': typeof AuthenticatedConsoleTeamRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
   '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
   '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
+  '/api/public/agents/v1/knowledge': typeof ApiPublicAgentsV1KnowledgeRoute
+  '/api/public/agents/v1/tasks': typeof ApiPublicAgentsV1TasksRoute
   '/api/public/agents/v1/whoami': typeof ApiPublicAgentsV1WhoamiRoute
   '/api/public/agents/v1/relay/jackboy': typeof ApiPublicAgentsV1RelayJackboyRoute
 }
@@ -119,13 +119,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/invite': typeof AuthenticatedInviteRoute
   '/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
-  '/console/team': typeof AuthenticatedConsoleTeamRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
   '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
   '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
+  '/api/public/agents/v1/knowledge': typeof ApiPublicAgentsV1KnowledgeRoute
+  '/api/public/agents/v1/tasks': typeof ApiPublicAgentsV1TasksRoute
   '/api/public/agents/v1/whoami': typeof ApiPublicAgentsV1WhoamiRoute
   '/api/public/agents/v1/relay/jackboy': typeof ApiPublicAgentsV1RelayJackboyRoute
 }
@@ -136,13 +136,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/console': typeof AuthenticatedConsoleRouteWithChildren
-  '/_authenticated/invite': typeof AuthenticatedInviteRoute
   '/_authenticated/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/_authenticated/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
-  '/_authenticated/console/team': typeof AuthenticatedConsoleTeamRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
   '/_authenticated/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
   '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
+  '/api/public/agents/v1/knowledge': typeof ApiPublicAgentsV1KnowledgeRoute
+  '/api/public/agents/v1/tasks': typeof ApiPublicAgentsV1TasksRoute
   '/api/public/agents/v1/whoami': typeof ApiPublicAgentsV1WhoamiRoute
   '/api/public/agents/v1/relay/jackboy': typeof ApiPublicAgentsV1RelayJackboyRoute
 }
@@ -153,13 +153,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/console'
-    | '/invite'
     | '/console/agents'
     | '/console/integrations'
-    | '/console/team'
     | '/console/'
     | '/console/issues/$issueId'
     | '/api/public/agents/v1/issues'
+    | '/api/public/agents/v1/knowledge'
+    | '/api/public/agents/v1/tasks'
     | '/api/public/agents/v1/whoami'
     | '/api/public/agents/v1/relay/jackboy'
   fileRoutesByTo: FileRoutesByTo
@@ -167,13 +167,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
-    | '/invite'
     | '/console/agents'
     | '/console/integrations'
-    | '/console/team'
     | '/console'
     | '/console/issues/$issueId'
     | '/api/public/agents/v1/issues'
+    | '/api/public/agents/v1/knowledge'
+    | '/api/public/agents/v1/tasks'
     | '/api/public/agents/v1/whoami'
     | '/api/public/agents/v1/relay/jackboy'
   id:
@@ -183,13 +183,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/console'
-    | '/_authenticated/invite'
     | '/_authenticated/console/agents'
     | '/_authenticated/console/integrations'
-    | '/_authenticated/console/team'
     | '/_authenticated/console/'
     | '/_authenticated/console/issues/$issueId'
     | '/api/public/agents/v1/issues'
+    | '/api/public/agents/v1/knowledge'
+    | '/api/public/agents/v1/tasks'
     | '/api/public/agents/v1/whoami'
     | '/api/public/agents/v1/relay/jackboy'
   fileRoutesById: FileRoutesById
@@ -200,6 +200,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicAgentsV1IssuesRoute: typeof ApiPublicAgentsV1IssuesRoute
+  ApiPublicAgentsV1KnowledgeRoute: typeof ApiPublicAgentsV1KnowledgeRoute
+  ApiPublicAgentsV1TasksRoute: typeof ApiPublicAgentsV1TasksRoute
   ApiPublicAgentsV1WhoamiRoute: typeof ApiPublicAgentsV1WhoamiRoute
   ApiPublicAgentsV1RelayJackboyRoute: typeof ApiPublicAgentsV1RelayJackboyRoute
 }
@@ -241,13 +243,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/invite': {
-      id: '/_authenticated/invite'
-      path: '/invite'
-      fullPath: '/invite'
-      preLoaderRoute: typeof AuthenticatedInviteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/console/': {
       id: '/_authenticated/console/'
       path: '/'
@@ -269,13 +264,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleIntegrationsRouteImport
       parentRoute: typeof AuthenticatedConsoleRoute
     }
-    '/_authenticated/console/team': {
-      id: '/_authenticated/console/team'
-      path: '/team'
-      fullPath: '/console/team'
-      preLoaderRoute: typeof AuthenticatedConsoleTeamRouteImport
-      parentRoute: typeof AuthenticatedConsoleRoute
-    }
     '/_authenticated/console/issues/$issueId': {
       id: '/_authenticated/console/issues/$issueId'
       path: '/issues/$issueId'
@@ -288,6 +276,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/agents/v1/issues'
       fullPath: '/api/public/agents/v1/issues'
       preLoaderRoute: typeof ApiPublicAgentsV1IssuesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agents/v1/knowledge': {
+      id: '/api/public/agents/v1/knowledge'
+      path: '/api/public/agents/v1/knowledge'
+      fullPath: '/api/public/agents/v1/knowledge'
+      preLoaderRoute: typeof ApiPublicAgentsV1KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agents/v1/tasks': {
+      id: '/api/public/agents/v1/tasks'
+      path: '/api/public/agents/v1/tasks'
+      fullPath: '/api/public/agents/v1/tasks'
+      preLoaderRoute: typeof ApiPublicAgentsV1TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/agents/v1/whoami': {
@@ -310,7 +312,6 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedConsoleRouteChildren {
   AuthenticatedConsoleAgentsRoute: typeof AuthenticatedConsoleAgentsRoute
   AuthenticatedConsoleIntegrationsRoute: typeof AuthenticatedConsoleIntegrationsRoute
-  AuthenticatedConsoleTeamRoute: typeof AuthenticatedConsoleTeamRoute
   AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
   AuthenticatedConsoleIssuesIssueIdRoute: typeof AuthenticatedConsoleIssuesIssueIdRoute
 }
@@ -318,7 +319,6 @@ interface AuthenticatedConsoleRouteChildren {
 const AuthenticatedConsoleRouteChildren: AuthenticatedConsoleRouteChildren = {
   AuthenticatedConsoleAgentsRoute: AuthenticatedConsoleAgentsRoute,
   AuthenticatedConsoleIntegrationsRoute: AuthenticatedConsoleIntegrationsRoute,
-  AuthenticatedConsoleTeamRoute: AuthenticatedConsoleTeamRoute,
   AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
   AuthenticatedConsoleIssuesIssueIdRoute:
     AuthenticatedConsoleIssuesIssueIdRoute,
@@ -329,12 +329,10 @@ const AuthenticatedConsoleRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedConsoleRoute: typeof AuthenticatedConsoleRouteWithChildren
-  AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConsoleRoute: AuthenticatedConsoleRouteWithChildren,
-  AuthenticatedInviteRoute: AuthenticatedInviteRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -346,6 +344,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicAgentsV1IssuesRoute: ApiPublicAgentsV1IssuesRoute,
+  ApiPublicAgentsV1KnowledgeRoute: ApiPublicAgentsV1KnowledgeRoute,
+  ApiPublicAgentsV1TasksRoute: ApiPublicAgentsV1TasksRoute,
   ApiPublicAgentsV1WhoamiRoute: ApiPublicAgentsV1WhoamiRoute,
   ApiPublicAgentsV1RelayJackboyRoute: ApiPublicAgentsV1RelayJackboyRoute,
 }

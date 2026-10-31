@@ -29,9 +29,10 @@ function ConsoleLayout() {
   const signOut = useSignOut();
   if (!access.isMember) return <NoAccess {...access} signOut={signOut} />;
   const nav = [
-    { to: "/console", label: "Operations" },
-    { to: "/console/integrations", label: "Integrations" },
-    ...(access.isOwner ? [{ to: "/console/agents", label: "Agents" }, { to: "/console/team", label: "Human access" }] : []),
+    { to: "/console", label: "QA observations" },
+    { to: "/console/memory", label: "Memory" },
+    { to: "/console/agents", label: "Agents & dispatch" },
+    { to: "/console/integrations", label: "Ecosystem" },
   ] as const;
   return (
     <div className="min-h-screen">
@@ -39,7 +40,7 @@ function ConsoleLayout() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-6 px-6 py-3">
           <div>
             <div className="font-bold">Razul</div>
-            <div className="label-mono">Game Development Observer</div>
+            <div className="label-mono">Ecosystem memory · observer · dispatcher</div>
           </div>
           <nav className="flex gap-1">
             {nav.map((n) => (
@@ -74,7 +75,7 @@ function NoAccess(p: ReturnType<typeof useAccess> & { signOut: () => void }) {
         <p className="label-mono">Access denied</p>
         <h1 className="text-2xl font-bold">No console access</h1>
         <p className="text-sm text-muted-foreground">
-          <span className="font-mono text-foreground">{p.email}</span> is signed in but has not been granted a role. Ask the owner for an invitation link.
+          <span className="font-mono text-foreground">{p.email}</span> is signed in but is not the owner. Human access to Razul is owner-only.
         </p>
         {p.bootstrapEligible && (
           <div className="rounded border border-primary/40 bg-accent p-4 text-sm">

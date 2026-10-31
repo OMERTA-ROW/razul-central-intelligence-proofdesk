@@ -19,7 +19,8 @@ export const categoryLabel = (c: string) => CATEGORIES.find(([k]) => k === c)?.[
 
 // Findings from read-only inspection of each project's code (no project was modified).
 export const INTEGRATIONS: {
-  id: "razul-hub" | "anomaly-legacy" | "jackboy" | "omni";
+  id: "razul-hub" | "anomaly-legacy" | "jackboy" | "omni" | "guardian" | "jax";
+  role: string;
   name: string;
   ref: string;
   handshake: "live" | "defined_needs_secrets" | "none";
@@ -27,12 +28,12 @@ export const INTEGRATIONS: {
   prerequisites: string[];
 }[] = [
   {
-    id: "razul-hub", name: "Razul hub (this project)", ref: "this project", handshake: "live",
-    finding: "Agent API live here: GET /api/public/agents/v1/whoami, GET|POST /api/public/agents/v1/issues. rza_ bearer credential + per-project grant required; every call audited.",
+    id: "razul-hub", role: "Memory, observation, research, dispatch of watcher agents", name: "Razul hub (this project)", ref: "this project", handshake: "live",
+    finding: "Agent API live here: whoami, issues (GET/POST), knowledge (GET/POST), tasks (GET/PATCH) under /api/public/agents/v1/. rza_ bearer credential + per-project grant required; every call audited.",
     prerequisites: ["Owner creates an agent, issues a credential, grants qa:read / qa:report on razul-hub"],
   },
   {
-    id: "jackboy", name: "Jackboy Developer Console", ref: "72823346-c174-4e90-9e17-671e197837c5", handshake: "defined_needs_secrets",
+    id: "jackboy", role: "Coding, architecture, testing, integration", name: "Jackboy Developer Console", ref: "72823346-c174-4e90-9e17-671e197837c5", handshake: "defined_needs_secrets",
     finding: "Jackboy already exposes POST /api/public/agent-ingest (Bearer jbk_ project token, owner-enrolled project, write-only, rate-limited, audited). Razul relays issues there as AngelTech 'diagnostic' reports via POST /api/public/agents/v1/relay/jackboy.",
     prerequisites: [
       "In Jackboy: enroll a project for Razul and issue its jbk_ ingest token (Jackboy owner, in Jackboy)",
@@ -42,14 +43,24 @@ export const INTEGRATIONS: {
     ],
   },
   {
-    id: "anomaly-legacy", name: "Anomaly Legacy", ref: "bc815e5c-10a5-405a-9e24-733180ad008f", handshake: "none",
+    id: "anomaly-legacy", role: "Game project (watched by a Sentinel)", name: "Anomaly Legacy", ref: "bc815e5c-10a5-405a-9e24-733180ad008f", handshake: "none",
     finding: "Has human QA (invite links, issue list) but no machine/agent endpoint. Agents cannot access it yet.",
     prerequisites: ["Anomaly Legacy owner adds an agent endpoint (e.g. evidence export or issue read) verifying a scoped token", "Then add its URL + token here and grant scopes on anomaly-legacy"],
   },
   {
-    id: "omni", name: "OMNI", ref: "Not confirmed (closest match: 'Orbiting Minds Mothership' f02f1b04-…)", handshake: "none",
+    id: "omni", role: "Orchestration", name: "OMNI", ref: "Not confirmed (closest match: 'Orbiting Minds Mothership' f02f1b04-…)", handshake: "none",
     finding: "No OMNI project confirmed and no agent handshake found.",
     prerequisites: ["Owner confirms which project is OMNI", "OMNI exposes a token-verified agent endpoint"],
+  },
+  {
+    id: "guardian", role: "Permissions & security oversight", name: "Guardian", ref: "No project identified", handshake: "none",
+    finding: "No Guardian project or endpoint found. Razul's activity log is ready to be exported to it once a contract exists.",
+    prerequisites: ["Owner identifies the Guardian project", "Guardian defines a token-verified audit intake"],
+  },
+  {
+    id: "jax", role: "Conceptual peer (integration not defined)", name: "JAX", ref: "No project identified", handshake: "none",
+    finding: "Conceptual integration only. No project, endpoint or contract identified.",
+    prerequisites: ["Owner identifies JAX and its role", "JAX exposes a token-verified endpoint"],
   },
 ];
 
