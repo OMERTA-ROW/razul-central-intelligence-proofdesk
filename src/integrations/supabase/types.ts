@@ -14,6 +14,157 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_audit: {
+        Row: {
+          action: string
+          actor_user: string | null
+          agent_id: string | null
+          created_at: string
+          detail: Json
+          id: string
+          outcome: string
+          target: string | null
+        }
+        Insert: {
+          action: string
+          actor_user?: string | null
+          agent_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          outcome: string
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user?: string | null
+          agent_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          outcome?: string
+          target?: string | null
+        }
+        Relationships: []
+      }
+      agent_credentials: {
+        Row: {
+          agent_id: string
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          last_used_at: string | null
+          revoked_at: string | null
+          token_hash: string
+          token_prefix: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          token_hash: string
+          token_prefix: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          token_hash?: string
+          token_prefix?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_credentials_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_grants: {
+        Row: {
+          agent_id: string
+          created_at: string
+          expires_at: string
+          granted_by: string
+          id: string
+          revoked_at: string | null
+          scopes: string[]
+          target: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          expires_at: string
+          granted_by: string
+          id?: string
+          revoked_at?: string | null
+          scopes: string[]
+          target: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          expires_at?: string
+          granted_by?: string
+          id?: string
+          revoked_at?: string | null
+          scopes?: string[]
+          target?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_grants_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents: {
+        Row: {
+          created_at: string
+          created_by: string
+          duties: string[]
+          id: string
+          last_seen_at: string | null
+          name: string
+          purpose: string
+          status: Database["public"]["Enums"]["agent_status"]
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          duties?: string[]
+          id?: string
+          last_seen_at?: string | null
+          name: string
+          purpose?: string
+          status?: Database["public"]["Enums"]["agent_status"]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          duties?: string[]
+          id?: string
+          last_seen_at?: string | null
+          name?: string
+          purpose?: string
+          status?: Database["public"]["Enums"]["agent_status"]
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -55,6 +206,7 @@ export type Database = {
       }
       qa_issues: {
         Row: {
+          agent_id: string | null
           build_version: string
           category: Database["public"]["Enums"]["issue_category"]
           created_at: string
@@ -63,7 +215,8 @@ export type Database = {
           id: string
           observed_behavior: string
           platform: string | null
-          reported_by: string
+          relayed_to: Json
+          reported_by: string | null
           repro_steps: string
           severity: Database["public"]["Enums"]["issue_severity"]
           source: string
@@ -72,6 +225,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agent_id?: string | null
           build_version: string
           category?: Database["public"]["Enums"]["issue_category"]
           created_at?: string
@@ -80,7 +234,8 @@ export type Database = {
           id?: string
           observed_behavior: string
           platform?: string | null
-          reported_by: string
+          relayed_to?: Json
+          reported_by?: string | null
           repro_steps: string
           severity?: Database["public"]["Enums"]["issue_severity"]
           source?: string
@@ -89,6 +244,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agent_id?: string | null
           build_version?: string
           category?: Database["public"]["Enums"]["issue_category"]
           created_at?: string
@@ -97,7 +253,8 @@ export type Database = {
           id?: string
           observed_behavior?: string
           platform?: string | null
-          reported_by?: string
+          relayed_to?: Json
+          reported_by?: string | null
           repro_steps?: string
           severity?: Database["public"]["Enums"]["issue_severity"]
           source?: string
@@ -105,7 +262,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "qa_issues_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_credentials: {
         Row: {
@@ -184,6 +349,7 @@ export type Database = {
       redeem_invitation: { Args: { _token: string }; Returns: string }
     }
     Enums: {
+      agent_status: "active" | "paused" | "revoked"
       app_role: "owner" | "reviewer"
       issue_category:
         | "animation_snapping"
@@ -330,6 +496,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      agent_status: ["active", "paused", "revoked"],
       app_role: ["owner", "reviewer"],
       issue_category: [
         "animation_snapping",

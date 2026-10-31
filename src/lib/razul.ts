@@ -14,63 +14,42 @@ export const SEVERITIES = ["blocker", "critical", "major", "minor", "trivial"] a
 export const STATUSES = ["new", "triaged", "in_progress", "fixed", "verified", "wont_fix", "duplicate"] as const;
 export const OPEN_STATUSES = ["new", "triaged", "in_progress"] as const;
 
-export const SERVICE_SCOPES = ["evidence:write", "telemetry:write", "issues:read", "issues:write"] as const;
 
 export const categoryLabel = (c: string) => CATEGORIES.find(([k]) => k === c)?.[1] ?? c;
 
-export type IntegrationStatus = "disconnected" | "contract_ready";
+// Findings from read-only inspection of each project's code (no project was modified).
 export const INTEGRATIONS: {
-  id: string;
+  id: "razul-hub" | "anomaly-legacy" | "jackboy" | "omni";
   name: string;
   ref: string;
-  status: IntegrationStatus;
-  direction: string;
-  contract: string;
+  handshake: "live" | "defined_needs_secrets" | "none";
+  finding: string;
   prerequisites: string[];
 }[] = [
   {
-    id: "anomaly-legacy",
-    name: "Anomaly Legacy",
-    ref: "bc815e5c-10a5-405a-9e24-733180ad008f",
-    status: "disconnected",
-    direction: "Anomaly Legacy → Razul (game-test evidence & telemetry)",
-    contract: "POST evidence bundles (build_version, session_id, clip/log reference, frame-time samples) using a scoped service credential with evidence:write / telemetry:write.",
+    id: "razul-hub", name: "Razul hub (this project)", ref: "this project", handshake: "live",
+    finding: "Agent API live here: GET /api/public/agents/v1/whoami, GET|POST /api/public/agents/v1/issues. rza_ bearer credential + per-project grant required; every call audited.",
+    prerequisites: ["Owner creates an agent, issues a credential, grants qa:read / qa:report on razul-hub"],
+  },
+  {
+    id: "jackboy", name: "Jackboy Developer Console", ref: "72823346-c174-4e90-9e17-671e197837c5", handshake: "defined_needs_secrets",
+    finding: "Jackboy already exposes POST /api/public/agent-ingest (Bearer jbk_ project token, owner-enrolled project, write-only, rate-limited, audited). Razul relays issues there as AngelTech 'diagnostic' reports via POST /api/public/agents/v1/relay/jackboy.",
     prerequisites: [
-      "Razul ingest endpoint enabled (not built yet)",
-      "Owner issues a service credential with evidence:write",
-      "Anomaly Legacy owner adds the credential to that project's secrets and implements the sender",
+      "In Jackboy: enroll a project for Razul and issue its jbk_ ingest token (Jackboy owner, in Jackboy)",
+      "Here: add secrets JACKBOY_BASE_URL (Jackboy's reachable app URL) and JACKBOY_INGEST_TOKEN",
+      "Grant the agent qa:report on jackboy",
+      "Note: Jackboy's own Razul module expects a different research-feed API (RAZUL_API_URL /v1/search, /v1/feed) that this QA hub does not provide",
     ],
   },
   {
-    id: "jackboy",
-    name: "Jackboy Developer Console",
-    ref: "72823346-c174-4e90-9e17-671e197837c5",
-    status: "disconnected",
-    direction: "Razul → Jackboy (issue handoff for repair)",
-    contract: "Jackboy pulls confirmed issues (issues:read) or receives the JSON handoff export below; Jackboy reports fix status back (issues:write, status only).",
-    prerequisites: [
-      "Owner issues credential with issues:read",
-      "Jackboy owner implements the pull client in that project",
-      "Agreement on status write-back rules",
-    ],
+    id: "anomaly-legacy", name: "Anomaly Legacy", ref: "bc815e5c-10a5-405a-9e24-733180ad008f", handshake: "none",
+    finding: "Has human QA (invite links, issue list) but no machine/agent endpoint. Agents cannot access it yet.",
+    prerequisites: ["Anomaly Legacy owner adds an agent endpoint (e.g. evidence export or issue read) verifying a scoped token", "Then add its URL + token here and grant scopes on anomaly-legacy"],
   },
   {
-    id: "omni",
-    name: "OMNI",
-    ref: "No project ID provided",
-    status: "disconnected",
-    direction: "Razul ↔ OMNI (orchestration of the repair loop)",
-    contract: "Read-only issue summary feed (issues:read). Contract to be confirmed against the role blueprint.",
-    prerequisites: ["OMNI project/endpoint identified by owner", "Scoped credential issued", "Contract confirmed"],
-  },
-  {
-    id: "guardian",
-    name: "Guardian",
-    ref: "No project ID provided",
-    status: "disconnected",
-    direction: "Guardian → Razul (security / access oversight)",
-    contract: "Guardian audits credential issuance and revocation. No data exchange defined yet.",
-    prerequisites: ["Guardian project/endpoint identified by owner", "Audit contract defined"],
+    id: "omni", name: "OMNI", ref: "Not confirmed (closest match: 'Orbiting Minds Mothership' f02f1b04-…)", handshake: "none",
+    finding: "No OMNI project confirmed and no agent handshake found.",
+    prerequisites: ["Owner confirms which project is OMNI", "OMNI exposes a token-verified agent endpoint"],
   },
 ];
 

@@ -1,0 +1,1 @@
+revoke all on public.agents, public.agent_grants, public.agent_credentials, public.agent_audit from anon;
