@@ -14,16 +14,195 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          revoked_at: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          token_hash: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          token_hash: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      qa_issues: {
+        Row: {
+          build_version: string
+          category: Database["public"]["Enums"]["issue_category"]
+          created_at: string
+          evidence_ref: string | null
+          expected_behavior: string
+          id: string
+          observed_behavior: string
+          platform: string | null
+          reported_by: string
+          repro_steps: string
+          severity: Database["public"]["Enums"]["issue_severity"]
+          source: string
+          status: Database["public"]["Enums"]["issue_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          build_version: string
+          category?: Database["public"]["Enums"]["issue_category"]
+          created_at?: string
+          evidence_ref?: string | null
+          expected_behavior: string
+          id?: string
+          observed_behavior: string
+          platform?: string | null
+          reported_by: string
+          repro_steps: string
+          severity?: Database["public"]["Enums"]["issue_severity"]
+          source?: string
+          status?: Database["public"]["Enums"]["issue_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          build_version?: string
+          category?: Database["public"]["Enums"]["issue_category"]
+          created_at?: string
+          evidence_ref?: string | null
+          expected_behavior?: string
+          id?: string
+          observed_behavior?: string
+          platform?: string | null
+          reported_by?: string
+          repro_steps?: string
+          severity?: Database["public"]["Enums"]["issue_severity"]
+          source?: string
+          status?: Database["public"]["Enums"]["issue_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_credentials: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          label: string
+          last_used_at: string | null
+          revoked_at: string | null
+          scopes: string[]
+          token_hash: string
+          token_prefix: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          label: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          scopes?: string[]
+          token_hash: string
+          token_prefix: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          label?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          scopes?: string[]
+          token_hash?: string
+          token_prefix?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_member: { Args: { _user_id: string }; Returns: boolean }
+      owner_exists: { Args: never; Returns: boolean }
+      redeem_invitation: { Args: { _token: string }; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "reviewer"
+      issue_category:
+        | "animation_snapping"
+        | "foot_sliding"
+        | "clipping"
+        | "collision_mismatch"
+        | "horse_chariot"
+        | "performance_spike"
+        | "multiplayer_desync"
+        | "other"
+      issue_severity: "blocker" | "critical" | "major" | "minor" | "trivial"
+      issue_status:
+        | "new"
+        | "triaged"
+        | "in_progress"
+        | "fixed"
+        | "verified"
+        | "wont_fix"
+        | "duplicate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +329,28 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "reviewer"],
+      issue_category: [
+        "animation_snapping",
+        "foot_sliding",
+        "clipping",
+        "collision_mismatch",
+        "horse_chariot",
+        "performance_spike",
+        "multiplayer_desync",
+        "other",
+      ],
+      issue_severity: ["blocker", "critical", "major", "minor", "trivial"],
+      issue_status: [
+        "new",
+        "triaged",
+        "in_progress",
+        "fixed",
+        "verified",
+        "wont_fix",
+        "duplicate",
+      ],
+    },
   },
 } as const
