@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/public/agents/v1/issues")({
           return deny(422, "Invalid payload: " + p.error.issues.map((i) => `${i.path.join(".")} ${i.message}`).join("; "));
         }
         const { data, error } = await r.db.from("qa_issues").insert({
-          ...p.data, category: p.data.category as never, source: "agent", agent_id: r.agent.id, reported_by: null, status: "new",
+          ...p.data, platform: p.data.platform ?? null, category: p.data.category as never, source: "agent", agent_id: r.agent.id, reported_by: null, status: "new",
         }).select("id").single();
         if (error) return deny(500, "Could not store issue");
         await audit({ agent_id: r.agent.id, action: "issues.create", target: "razul-hub", outcome: "ok", detail: { issue: data.id } });
