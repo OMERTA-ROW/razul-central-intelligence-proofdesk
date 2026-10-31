@@ -63,12 +63,15 @@ function Memory() {
             <li key={x.id} className="rounded-lg border bg-card p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded border border-primary/40 px-2 py-0.5 font-mono text-[10px] uppercase text-primary">{x.kind}</span>
+                <span className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase ${x.status === "confirmed" ? "border-success/40 text-success" : x.status === "proposed" ? "border-warning/40 text-warning" : "border-offline/40 text-offline"}`}>{x.status}</span>
                 <span className="label-mono">{x.project} · {x.evidence}</span>
-                <span className="ml-auto font-mono text-xs text-muted-foreground">{x.agent_id ? `agent: ${(x.agents as { name: string } | null)?.name ?? "removed"}` : "owner"} · {new Date(x.created_at).toLocaleString()}</span>
+                <span className="ml-auto font-mono text-xs text-muted-foreground">{x.agent_id ? `agent: ${(x.agents as { name: string } | null)?.name ?? "removed"}` : x.origin === "recovered_brief" ? "recovered owner brief" : "owner"} · {new Date(x.created_at).toLocaleString()}</span>
               </div>
               <p className="mt-2 font-medium">{x.title}</p>
               {x.body && <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{x.body}</p>}
-              {(x.sources as { url: string }[]).map((s) => <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className="block break-all font-mono text-xs text-primary">{s.url}</a>)}
+              {(x.sources as { url?: string; label?: string; note?: string }[]).map((s, i) => s.url
+                ? <a key={i} href={s.url} target="_blank" rel="noreferrer" className="block break-all font-mono text-xs text-primary">{s.url}{s.note ? ` (${s.note})` : ""}</a>
+                : <span key={i} className="block font-mono text-xs text-muted-foreground">source: {s.label}</span>)}
             </li>
           ))}
         </ul>

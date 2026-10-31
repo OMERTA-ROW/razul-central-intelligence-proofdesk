@@ -29,10 +29,11 @@ function ConsoleLayout() {
   const signOut = useSignOut();
   if (!access.isMember) return <NoAccess {...access} signOut={signOut} />;
   const nav = [
-    { to: "/console", label: "QA observations" },
+    { to: "/console", label: "Razul" },
     { to: "/console/memory", label: "Memory" },
     { to: "/console/agents", label: "Agents & dispatch" },
     { to: "/console/integrations", label: "Ecosystem" },
+    { to: "/console/qa", label: "Game QA" },
   ] as const;
   return (
     <div className="min-h-screen">
