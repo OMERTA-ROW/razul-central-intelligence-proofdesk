@@ -4,5 +4,5 @@ import { getMyAccess } from "./razul.functions";
 export const accessQuery = queryOptions({ queryKey: ["access"], queryFn: () => getMyAccess() });
 export function useAccess() {
   const { data } = useSuspenseQuery(accessQuery);
-  return { ...data, isOwner: data.roles.includes("owner"), isMember: data.roles.length > 0 };
+  return { ...data, isOwner: data.roles.includes("owner"), isMember: data.roles.includes("owner") };
 }
