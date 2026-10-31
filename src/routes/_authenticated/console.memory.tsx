@@ -23,14 +23,14 @@ function Memory() {
       return (await q).data ?? [];
     },
   });
-  const [f, setF] = useState({ kind: "observation", project: "ecosystem", evidence: "observed", title: "", body: "", source: "" });
+  const [f, setF] = useState({ kind: "observation", project: "ecosystem", evidence: "observed", status: "confirmed", title: "", body: "", source: "" });
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
     const { data: u } = await supabase.auth.getUser();
     const sources = f.source.trim() ? [{ url: f.source.trim() }] : [];
     const { error } = await supabase.from("knowledge_entries").insert({
-      kind: f.kind as never, project: f.project, evidence: f.evidence as never, title: f.title, body: f.body, sources, author_user: u.user!.id,
+      kind: f.kind as never, project: f.project, evidence: f.evidence as never, status: f.status, title: f.title, body: f.body, sources, author_user: u.user!.id,
     });
     if (error) return void toast.error(error.message.includes("research_needs_sources") ? "Research entries need a source URL." : error.message);
     setF({ ...f, title: "", body: "", source: "" });
@@ -47,6 +47,7 @@ function Memory() {
         <select className={sel} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{KINDS.map((k) => <option key={k}>{k}</option>)}</select>
         <select className={sel} value={f.project} onChange={(e) => setF({ ...f, project: e.target.value })}>{PROJECTS.map((k) => <option key={k}>{k}</option>)}</select>
         <select className={sel} value={f.evidence} onChange={(e) => setF({ ...f, evidence: e.target.value })}>{EVIDENCE.map((k) => <option key={k}>{k}</option>)}</select>
+        <select className={sel} value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>{["confirmed", "proposed", "superseded"].map((k) => <option key={k}>{k}</option>)}</select>
         <Input className="sm:col-span-3" required minLength={3} placeholder="Title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
         <Textarea className="sm:col-span-3" placeholder="Details" value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
         <Input className="sm:col-span-2" type="url" placeholder="Source URL (required for research)" value={f.source} onChange={(e) => setF({ ...f, source: e.target.value })} />
@@ -63,12 +64,15 @@ function Memory() {
             <li key={x.id} className="rounded-lg border bg-card p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded border border-primary/40 px-2 py-0.5 font-mono text-[10px] uppercase text-primary">{x.kind}</span>
+                <span className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase ${x.status === "confirmed" ? "border-success/40 text-success" : x.status === "proposed" ? "border-warning/40 text-warning" : "border-offline/40 text-offline"}`}>{x.status}</span>
                 <span className="label-mono">{x.project} · {x.evidence}</span>
-                <span className="ml-auto font-mono text-xs text-muted-foreground">{x.agent_id ? `agent: ${(x.agents as { name: string } | null)?.name ?? "removed"}` : "owner"} · {new Date(x.created_at).toLocaleString()}</span>
+                <span className="ml-auto font-mono text-xs text-muted-foreground">{x.agent_id ? `agent: ${(x.agents as { name: string } | null)?.name ?? "removed"}` : x.origin === "recovered_brief" ? "recovered owner brief" : "owner"} · {new Date(x.created_at).toLocaleString()}</span>
               </div>
               <p className="mt-2 font-medium">{x.title}</p>
               {x.body && <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{x.body}</p>}
-              {(x.sources as { url: string }[]).map((s) => <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className="block break-all font-mono text-xs text-primary">{s.url}</a>)}
+              {(x.sources as { url?: string; label?: string; note?: string }[]).map((s, i) => s.url
+                ? <a key={i} href={s.url} target="_blank" rel="noreferrer" className="block break-all font-mono text-xs text-primary">{s.url}{s.note ? ` (${s.note})` : ""}</a>
+                : <span key={i} className="block font-mono text-xs text-muted-foreground">source: {s.label}</span>)}
             </li>
           ))}
         </ul>

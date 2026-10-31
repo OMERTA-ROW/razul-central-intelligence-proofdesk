@@ -18,6 +18,7 @@ import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedConsoleAgentsRouteImport } from './routes/_authenticated/console.agents'
 import { Route as AuthenticatedConsoleIntegrationsRouteImport } from './routes/_authenticated/console.integrations'
 import { Route as AuthenticatedConsoleMemoryRouteImport } from './routes/_authenticated/console.memory'
+import { Route as AuthenticatedConsoleQaRouteImport } from './routes/_authenticated/console.qa'
 import { Route as AuthenticatedConsoleIssuesIssueIdRouteImport } from './routes/_authenticated/console.issues.$issueId'
 import { Route as ApiPublicAgentsV1IssuesRouteImport } from './routes/api/public/agents/v1/issues'
 import { Route as ApiPublicAgentsV1KnowledgeRouteImport } from './routes/api/public/agents/v1/knowledge'
@@ -73,6 +74,11 @@ const AuthenticatedConsoleMemoryRoute =
     path: '/memory',
     getParentRoute: () => AuthenticatedConsoleRoute,
   } as any)
+const AuthenticatedConsoleQaRoute = AuthenticatedConsoleQaRouteImport.update({
+  id: '/qa',
+  path: '/qa',
+  getParentRoute: () => AuthenticatedConsoleRoute,
+} as any)
 const AuthenticatedConsoleIssuesIssueIdRoute =
   AuthenticatedConsoleIssuesIssueIdRouteImport.update({
     id: '/issues/$issueId',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
   '/console/memory': typeof AuthenticatedConsoleMemoryRoute
+  '/console/qa': typeof AuthenticatedConsoleQaRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
   '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
   '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
   '/console/memory': typeof AuthenticatedConsoleMemoryRoute
+  '/console/qa': typeof AuthenticatedConsoleQaRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
   '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
   '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/console/agents': typeof AuthenticatedConsoleAgentsRoute
   '/_authenticated/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
   '/_authenticated/console/memory': typeof AuthenticatedConsoleMemoryRoute
+  '/_authenticated/console/qa': typeof AuthenticatedConsoleQaRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
   '/_authenticated/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
   '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/console/agents'
     | '/console/integrations'
     | '/console/memory'
+    | '/console/qa'
     | '/console/'
     | '/console/issues/$issueId'
     | '/api/public/agents/v1/issues'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/console/agents'
     | '/console/integrations'
     | '/console/memory'
+    | '/console/qa'
     | '/console'
     | '/console/issues/$issueId'
     | '/api/public/agents/v1/issues'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/_authenticated/console/agents'
     | '/_authenticated/console/integrations'
     | '/_authenticated/console/memory'
+    | '/_authenticated/console/qa'
     | '/_authenticated/console/'
     | '/_authenticated/console/issues/$issueId'
     | '/api/public/agents/v1/issues'
@@ -284,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleMemoryRouteImport
       parentRoute: typeof AuthenticatedConsoleRoute
     }
+    '/_authenticated/console/qa': {
+      id: '/_authenticated/console/qa'
+      path: '/qa'
+      fullPath: '/console/qa'
+      preLoaderRoute: typeof AuthenticatedConsoleQaRouteImport
+      parentRoute: typeof AuthenticatedConsoleRoute
+    }
     '/_authenticated/console/issues/$issueId': {
       id: '/_authenticated/console/issues/$issueId'
       path: '/issues/$issueId'
@@ -333,6 +352,7 @@ interface AuthenticatedConsoleRouteChildren {
   AuthenticatedConsoleAgentsRoute: typeof AuthenticatedConsoleAgentsRoute
   AuthenticatedConsoleIntegrationsRoute: typeof AuthenticatedConsoleIntegrationsRoute
   AuthenticatedConsoleMemoryRoute: typeof AuthenticatedConsoleMemoryRoute
+  AuthenticatedConsoleQaRoute: typeof AuthenticatedConsoleQaRoute
   AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
   AuthenticatedConsoleIssuesIssueIdRoute: typeof AuthenticatedConsoleIssuesIssueIdRoute
 }
@@ -341,6 +361,7 @@ const AuthenticatedConsoleRouteChildren: AuthenticatedConsoleRouteChildren = {
   AuthenticatedConsoleAgentsRoute: AuthenticatedConsoleAgentsRoute,
   AuthenticatedConsoleIntegrationsRoute: AuthenticatedConsoleIntegrationsRoute,
   AuthenticatedConsoleMemoryRoute: AuthenticatedConsoleMemoryRoute,
+  AuthenticatedConsoleQaRoute: AuthenticatedConsoleQaRoute,
   AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
   AuthenticatedConsoleIssuesIssueIdRoute:
     AuthenticatedConsoleIssuesIssueIdRoute,

@@ -1,136 +1,92 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { toast } from "sonner";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { IssueForm, SeverityBadge, type IssueInput } from "@/components/IssueForm";
-import { CATEGORIES, OPEN_STATUSES, PLANNED_ANALYSIS, SEVERITIES, categoryLabel } from "@/lib/razul";
+import { INTEGRATIONS } from "@/lib/razul";
 
-export const issuesQuery = queryOptions({
-  queryKey: ["issues"],
+const overviewQuery = queryOptions({
+  queryKey: ["razul-overview"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("qa_issues").select("*").order("created_at", { ascending: false });
-    if (error) throw error;
-    return data;
+    const [mem, agents, grants, tasks] = await Promise.all([
+      supabase.from("knowledge_entries").select("id,title,body,status,origin,project,kind,created_at").order("created_at", { ascending: false }).limit(100),
+      supabase.from("agents").select("id,name,role,status"),
+      supabase.from("agent_grants").select("id,target,revoked_at,expires_at"),
+      supabase.from("agent_tasks").select("id,status"),
+    ]);
+    return { mem: mem.data ?? [], agents: agents.data ?? [], grants: grants.data ?? [], tasks: tasks.data ?? [] };
   },
 });
 
 export const Route = createFileRoute("/_authenticated/console/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(issuesQuery),
-  component: Operations,
+  loader: ({ context }) => context.queryClient.ensureQueryData(overviewQuery),
+  head: () => ({ meta: [{ title: "Razul — Ecosystem memory & watchers" }, { name: "description", content: "Razul's owner console: memory, watcher agents and connection readiness." }] }),
+  component: Front,
 });
 
-function Operations() {
-  const { data: issues } = useSuspenseQuery(issuesQuery);
-  const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const queue = issues.filter((i) => (OPEN_STATUSES as readonly string[]).includes(i.status));
+const tone: Record<string, string> = { confirmed: "text-success border-success/40", proposed: "text-warning border-warning/40", superseded: "text-offline border-offline/40" };
 
-  async function create(v: IssueInput) {
-    const { data: u } = await supabase.auth.getUser();
-    const { error } = await supabase.from("qa_issues").insert({ ...v, reported_by: u.user!.id, source: "manual" });
-    if (error) return void toast.error(error.message);
-    toast.success("Issue logged.");
-    setOpen(false);
-    qc.invalidateQueries({ queryKey: ["issues"] });
-  }
-
-  function exportHandoff() {
-    const payload = {
-      schema: "razul.handoff.v1",
-      generated_at: new Date().toISOString(),
-      source: "Razul — Game Development Observer (manual review)",
-      note: "Manually logged issues only. No automated telemetry analysis included.",
-      issues: queue.map(({ reported_by: _r, agent_id: _a, ...i }) => i),
-    };
-    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a");
-    a.href = url; a.download = `razul-handoff-${Date.now()}.json`; a.click();
-    URL.revokeObjectURL(url);
-  }
+function Front() {
+  const { data } = useSuspenseQuery(overviewQuery);
+  const now = Date.now();
+  const liveGrants = data.grants.filter((g) => !g.revoked_at && new Date(g.expires_at).getTime() > now);
+  const active = data.agents.filter((a) => a.status === "active");
+  const queued = data.tasks.filter((t) => t.status === "queued").length;
+  const charter = data.mem.filter((m) => m.origin === "recovered_brief");
 
   return (
     <div className="space-y-8">
-      <section className="grid gap-4 md:grid-cols-3">
-        <StatusCard label="Manual review" value="Active" tone="success" detail="Issue logging & evidence references are live." />
-        <StatusCard label="Agent API (this hub)" value="Live" tone="success" detail="Granted agents can read/report issues with their own credential." />
-        <StatusCard label="Automated analysis" value="Planned" tone="offline" detail="No autonomous telemetry analysis runs; agents report what they observe." />
+      <section className="rounded-lg border bg-card p-6">
+        <p className="label-mono">Razul · owner-only</p>
+        <h1 className="mt-1 text-3xl font-bold">Ecosystem memory, research & watcher agents</h1>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+          Razul keeps the ecosystem's history and observations, records sourced public-web research, and dispatches authorized
+          Sentinel / AngelTech / DemonTech agents that each hold their own scoped, expiring access to assigned projects.
+          Agents only act when an external runtime polls their tasks — nothing runs autonomously from here.
+        </p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-4">
+          <Stat label="Memory entries" value={data.mem.length} />
+          <Stat label="Active agents" value={`${active.length}/${data.agents.length}`} />
+          <Stat label="Live grants" value={liveGrants.length} />
+          <Stat label="Queued tasks" value={queued} />
+        </div>
       </section>
 
-      <section className="rounded-lg border bg-card">
-        <div className="flex flex-wrap items-center gap-3 border-b p-4">
-          <div>
-            <h2 className="font-semibold">Evidence queue</h2>
-            <p className="label-mono">{queue.length} open · {issues.length} total</p>
-          </div>
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" onClick={exportHandoff} disabled={!queue.length}>Export handoff JSON</Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild><Button size="sm">Log issue</Button></DialogTrigger>
-              <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-                <DialogHeader><DialogTitle>Log observed issue</DialogTitle></DialogHeader>
-                <IssueForm onSubmit={create} submitLabel="Save issue" />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-        {queue.length === 0 ? (
-          <p className="p-8 text-center text-sm text-muted-foreground">Queue is empty. Log an issue from reviewed game-test evidence.</p>
-        ) : (
-          <ul className="divide-y">
-            {queue.map((i) => (
-              <li key={i.id}>
-                <Link to="/console/issues/$issueId" params={{ issueId: i.id }} className="flex flex-wrap items-center gap-3 p-4 hover:bg-muted">
-                  <SeverityBadge s={i.severity} />
-                  <span className="font-medium">{i.title}</span>{i.source === "agent" && <span className="label-mono text-primary">agent</span>}
-                  <span className="label-mono">{categoryLabel(i.category)}</span>
-                  <span className="ml-auto font-mono text-xs text-muted-foreground">{i.build_version} · {i.status.replace("_", " ")}</span>
-                </Link>
+      <section className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex items-center"><h2 className="font-semibold">Charter memory</h2><Link to="/console/memory" className="ml-auto text-xs text-primary">All memory →</Link></div>
+          <p className="label-mono mb-3">Recovered from owner brief · labeled confirmed / proposed / superseded</p>
+          <ul className="space-y-3">
+            {charter.map((m) => (
+              <li key={m.id} className="text-sm">
+                <span className={`mr-2 rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase ${tone[m.status]}`}>{m.status}</span>
+                <span className="font-medium">{m.title}</span>
+                <p className="mt-0.5 text-xs text-muted-foreground">{m.body}</p>
               </li>
             ))}
           </ul>
-        )}
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border bg-card p-4">
-          <h2 className="font-semibold">Review report</h2>
-          <p className="label-mono mb-3">All issues by category</p>
-          <table className="w-full text-sm">
-            <tbody>
-              {CATEGORIES.map(([k, l]) => {
-                const n = issues.filter((i) => i.category === k).length;
-                return <tr key={k} className="border-t"><td className="py-1.5">{l}</td><td className="text-right font-mono">{n}</td></tr>;
-              })}
-            </tbody>
-          </table>
-          <p className="label-mono mt-4 mb-2">By severity (open)</p>
-          <div className="flex flex-wrap gap-3 text-sm">
-            {SEVERITIES.map((s) => <span key={s} className="flex items-center gap-1"><SeverityBadge s={s} /><span className="font-mono">{queue.filter((i) => i.severity === s).length}</span></span>)}
-          </div>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <h2 className="font-semibold">Planned automated analysis</h2>
-          <p className="label-mono mb-3">Not implemented · requires telemetry ingest</p>
-          <ul className="space-y-1.5 text-sm text-muted-foreground">
-            {PLANNED_ANALYSIS.map((p) => <li key={p}>○ {p}</li>)}
+          <div className="flex items-center"><h2 className="font-semibold">Connection readiness</h2><Link to="/console/integrations" className="ml-auto text-xs text-primary">Details →</Link></div>
+          <p className="label-mono mb-3">Only verified handshakes are shown as live</p>
+          <ul className="divide-y text-sm">
+            {INTEGRATIONS.map((i) => (
+              <li key={i.id} className="flex items-center gap-3 py-2">
+                <span className={`h-2 w-2 rounded-full ${i.handshake === "live" ? "bg-success" : i.handshake === "defined_needs_secrets" ? "bg-warning" : "bg-offline"}`} />
+                <span className="font-medium">{i.name}</span>
+                <span className="ml-auto label-mono">{i.handshake === "live" ? "live" : i.handshake === "defined_needs_secrets" ? "needs secrets" : "not connected"}</span>
+              </li>
+            ))}
           </ul>
+          <p className="mt-3 text-xs text-muted-foreground">Agent runtime: <span className="text-offline">none connected</span>. Tasks stay queued until an agent polls with its own credential.</p>
+          <div className="mt-4 flex gap-2 text-xs">
+            <Link to="/console/agents" className="text-primary">Manage agents & grants →</Link>
+            <Link to="/console/qa" className="ml-auto text-primary">Game QA log →</Link>
+          </div>
         </div>
       </section>
     </div>
   );
 }
 
-function StatusCard({ label, value, detail, tone }: { label: string; value: string; detail: string; tone: "success" | "offline" }) {
-  return (
-    <div className="rounded-lg border bg-card p-4">
-      <p className="label-mono">{label}</p>
-      <p className={`mt-1 flex items-center gap-2 text-lg font-semibold ${tone === "success" ? "text-success" : "text-offline"}`}>
-        <span className={`h-2 w-2 rounded-full ${tone === "success" ? "bg-success pulse-dot" : "bg-offline"}`} />{value}
-      </p>
-      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
-    </div>
-  );
+function Stat({ label, value }: { label: string; value: number | string }) {
+  return <div className="rounded border p-3"><p className="label-mono">{label}</p><p className="mt-1 font-mono text-xl">{value}</p></div>;
 }

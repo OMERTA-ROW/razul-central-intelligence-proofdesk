@@ -274,8 +274,10 @@ export type Database = {
           id: string
           kind: Database["public"]["Enums"]["knowledge_kind"]
           occurred_at: string | null
+          origin: string
           project: string
           sources: Json
+          status: string
           tags: string[]
           title: string
         }
@@ -288,8 +290,10 @@ export type Database = {
           id?: string
           kind: Database["public"]["Enums"]["knowledge_kind"]
           occurred_at?: string | null
+          origin?: string
           project?: string
           sources?: Json
+          status?: string
           tags?: string[]
           title: string
         }
@@ -302,8 +306,10 @@ export type Database = {
           id?: string
           kind?: Database["public"]["Enums"]["knowledge_kind"]
           occurred_at?: string | null
+          origin?: string
           project?: string
           sources?: Json
+          status?: string
           tags?: string[]
           title?: string
         }
