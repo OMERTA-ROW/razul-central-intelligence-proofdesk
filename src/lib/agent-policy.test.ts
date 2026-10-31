@@ -3,7 +3,7 @@ import { authorize, isWellFormedAgentToken, toJackboySeverity } from "./agent-po
 
 const future = new Date(Date.now() + 864e5).toISOString();
 const past = new Date(Date.now() - 1000).toISOString();
-const qa = { status: "active", duties: ["qa_observer"] };
+const qa = { status: "active", duties: ["qa_observer"], role: "sentinel" };
 
 describe("agent authorization", () => {
   it("allows a scoped, active grant for the same project", () => {
@@ -28,6 +28,13 @@ describe("agent authorization", () => {
     const g = [{ target: "razul-hub", scopes: ["dev:propose"], expires_at: future, revoked_at: null }];
     expect(authorize(qa, g, "razul-hub", "dev:propose")).toEqual({ ok: false, reason: "dev_duty_required" });
     expect(authorize({ status: "active", duties: ["qa_observer", "developer"] }, g, "razul-hub", "dev:propose").ok).toBe(true);
+  });
+  it("reserves security inspection to DemonTech and research to AngelTech", () => {
+    const g = [{ target: "jackboy", scopes: ["security:inspect", "research:propose"], expires_at: future, revoked_at: null }];
+    expect(authorize(qa, g, "jackboy", "security:inspect")).toEqual({ ok: false, reason: "role_demontech_required" });
+    expect(authorize({ ...qa, role: "demontech" }, g, "jackboy", "security:inspect").ok).toBe(true);
+    expect(authorize({ ...qa, role: "demontech" }, g, "jackboy", "research:propose").ok).toBe(false);
+    expect(authorize({ ...qa, role: "angeltech" }, g, "jackboy", "research:propose").ok).toBe(true);
   });
   it("validates token format and maps severities", () => {
     expect(isWellFormedAgentToken("rza_" + "a".repeat(64))).toBe(true);
