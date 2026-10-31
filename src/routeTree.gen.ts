@@ -19,6 +19,9 @@ import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedConsoleIntegrationsRouteImport } from './routes/_authenticated/console.integrations'
 import { Route as AuthenticatedConsoleTeamRouteImport } from './routes/_authenticated/console.team'
 import { Route as AuthenticatedConsoleIssuesIssueIdRouteImport } from './routes/_authenticated/console.issues.$issueId'
+import { Route as ApiPublicAgentsV1IssuesRouteImport } from './routes/api/public/agents/v1/issues'
+import { Route as ApiPublicAgentsV1WhoamiRouteImport } from './routes/api/public/agents/v1/whoami'
+import { Route as ApiPublicAgentsV1RelayJackboyRouteImport } from './routes/api/public/agents/v1/relay.jackboy'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -73,6 +76,22 @@ const AuthenticatedConsoleIssuesIssueIdRoute =
     path: '/issues/$issueId',
     getParentRoute: () => AuthenticatedConsoleRoute,
   } as any)
+const ApiPublicAgentsV1IssuesRoute = ApiPublicAgentsV1IssuesRouteImport.update({
+  id: '/api/public/agents/v1/issues',
+  path: '/api/public/agents/v1/issues',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAgentsV1WhoamiRoute = ApiPublicAgentsV1WhoamiRouteImport.update({
+  id: '/api/public/agents/v1/whoami',
+  path: '/api/public/agents/v1/whoami',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAgentsV1RelayJackboyRoute =
+  ApiPublicAgentsV1RelayJackboyRouteImport.update({
+    id: '/api/public/agents/v1/relay/jackboy',
+    path: '/api/public/agents/v1/relay/jackboy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,6 +103,9 @@ export interface FileRoutesByFullPath {
   '/console/team': typeof AuthenticatedConsoleTeamRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
   '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
+  '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
+  '/api/public/agents/v1/whoami': typeof ApiPublicAgentsV1WhoamiRoute
+  '/api/public/agents/v1/relay/jackboy': typeof ApiPublicAgentsV1RelayJackboyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +116,9 @@ export interface FileRoutesByTo {
   '/console/team': typeof AuthenticatedConsoleTeamRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
   '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
+  '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
+  '/api/public/agents/v1/whoami': typeof ApiPublicAgentsV1WhoamiRoute
+  '/api/public/agents/v1/relay/jackboy': typeof ApiPublicAgentsV1RelayJackboyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +132,9 @@ export interface FileRoutesById {
   '/_authenticated/console/team': typeof AuthenticatedConsoleTeamRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
   '/_authenticated/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
+  '/api/public/agents/v1/issues': typeof ApiPublicAgentsV1IssuesRoute
+  '/api/public/agents/v1/whoami': typeof ApiPublicAgentsV1WhoamiRoute
+  '/api/public/agents/v1/relay/jackboy': typeof ApiPublicAgentsV1RelayJackboyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,6 +148,9 @@ export interface FileRouteTypes {
     | '/console/team'
     | '/console/'
     | '/console/issues/$issueId'
+    | '/api/public/agents/v1/issues'
+    | '/api/public/agents/v1/whoami'
+    | '/api/public/agents/v1/relay/jackboy'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -130,6 +161,9 @@ export interface FileRouteTypes {
     | '/console/team'
     | '/console'
     | '/console/issues/$issueId'
+    | '/api/public/agents/v1/issues'
+    | '/api/public/agents/v1/whoami'
+    | '/api/public/agents/v1/relay/jackboy'
   id:
     | '__root__'
     | '/'
@@ -142,6 +176,9 @@ export interface FileRouteTypes {
     | '/_authenticated/console/team'
     | '/_authenticated/console/'
     | '/_authenticated/console/issues/$issueId'
+    | '/api/public/agents/v1/issues'
+    | '/api/public/agents/v1/whoami'
+    | '/api/public/agents/v1/relay/jackboy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -149,6 +186,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicAgentsV1IssuesRoute: typeof ApiPublicAgentsV1IssuesRoute
+  ApiPublicAgentsV1WhoamiRoute: typeof ApiPublicAgentsV1WhoamiRoute
+  ApiPublicAgentsV1RelayJackboyRoute: typeof ApiPublicAgentsV1RelayJackboyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -223,6 +263,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleIssuesIssueIdRouteImport
       parentRoute: typeof AuthenticatedConsoleRoute
     }
+    '/api/public/agents/v1/issues': {
+      id: '/api/public/agents/v1/issues'
+      path: '/api/public/agents/v1/issues'
+      fullPath: '/api/public/agents/v1/issues'
+      preLoaderRoute: typeof ApiPublicAgentsV1IssuesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agents/v1/whoami': {
+      id: '/api/public/agents/v1/whoami'
+      path: '/api/public/agents/v1/whoami'
+      fullPath: '/api/public/agents/v1/whoami'
+      preLoaderRoute: typeof ApiPublicAgentsV1WhoamiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agents/v1/relay/jackboy': {
+      id: '/api/public/agents/v1/relay/jackboy'
+      path: '/api/public/agents/v1/relay/jackboy'
+      fullPath: '/api/public/agents/v1/relay/jackboy'
+      preLoaderRoute: typeof ApiPublicAgentsV1RelayJackboyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -262,6 +323,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicAgentsV1IssuesRoute: ApiPublicAgentsV1IssuesRoute,
+  ApiPublicAgentsV1WhoamiRoute: ApiPublicAgentsV1WhoamiRoute,
+  ApiPublicAgentsV1RelayJackboyRoute: ApiPublicAgentsV1RelayJackboyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
