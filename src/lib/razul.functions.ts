@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { SERVICE_SCOPES } from "./razul";
 
 function randomToken(bytes = 32) {
   const a = new Uint8Array(bytes);
@@ -67,24 +66,29 @@ export const createInvitation = createServerFn({ method: "POST" })
     return { token };
   });
 
-export const createServiceCredential = createServerFn({ method: "POST" })
+export const issueAgentCredential = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: { label: string; scopes: string[] }) => {
-    const label = String(i?.label ?? "").trim().slice(0, 80);
-    const scopes = (i?.scopes ?? []).filter((s) => (SERVICE_SCOPES as readonly string[]).includes(s));
-    if (!label || scopes.length === 0) throw new Error("Label and at least one scope required");
-    return { label, scopes };
+  .inputValidator((i: { agentId: string; days: number }) => {
+    const days = Math.min(90, Math.max(1, Math.floor(Number(i?.days) || 30)));
+    if (!/^[0-9a-f-]{36}$/.test(String(i?.agentId))) throw new Error("Invalid agent");
+    return { agentId: i.agentId, days };
   })
   .handler(async ({ data, context }) => {
-    const token = `rzl_${randomToken(24)}`;
-    const { error } = await context.supabase.from("service_credentials").insert({
-      label: data.label,
-      scopes: data.scopes,
-      token_prefix: token.slice(0, 10),
+    const token = `rza_${randomToken(32)}`;
+    const { error } = await context.supabase.from("agent_credentials").insert({
+      agent_id: data.agentId,
+      token_prefix: token.slice(0, 12),
       token_hash: await sha256Hex(token),
       created_by: context.userId,
-      expires_at: new Date(Date.now() + 90 * 864e5).toISOString(),
+      expires_at: new Date(Date.now() + data.days * 864e5).toISOString(),
     });
-    if (error) throw new Error("Only the owner can issue service credentials.");
+    if (error) throw new Error("Only the owner can issue agent credentials.");
     return { token };
   });
+
+/** Reports which connections have their required secrets configured. Booleans only, never values. */
+export const getConnectionReadiness = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => ({
+    jackboy: { baseUrl: !!process.env["JACKBOY_BASE_URL"], ingestToken: !!process.env["JACKBOY_INGEST_TOKEN"] },
+  }));
