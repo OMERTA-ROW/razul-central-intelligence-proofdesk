@@ -10,33 +10,145 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedConsoleRouteImport } from './routes/_authenticated/console'
+import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
+import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
+import { Route as AuthenticatedConsoleIntegrationsRouteImport } from './routes/_authenticated/console.integrations'
+import { Route as AuthenticatedConsoleTeamRouteImport } from './routes/_authenticated/console.team'
+import { Route as AuthenticatedConsoleIssuesIssueIdRouteImport } from './routes/_authenticated/console.issues.$issueId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedConsoleRoute = AuthenticatedConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInviteRoute = AuthenticatedInviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedConsoleIndexRoute =
+  AuthenticatedConsoleIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedConsoleRoute,
+  } as any)
+const AuthenticatedConsoleIntegrationsRoute =
+  AuthenticatedConsoleIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedConsoleRoute,
+  } as any)
+const AuthenticatedConsoleTeamRoute =
+  AuthenticatedConsoleTeamRouteImport.update({
+    id: '/team',
+    path: '/team',
+    getParentRoute: () => AuthenticatedConsoleRoute,
+  } as any)
+const AuthenticatedConsoleIssuesIssueIdRoute =
+  AuthenticatedConsoleIssuesIssueIdRouteImport.update({
+    id: '/issues/$issueId',
+    path: '/issues/$issueId',
+    getParentRoute: () => AuthenticatedConsoleRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/console': typeof AuthenticatedConsoleRouteWithChildren
+  '/invite': typeof AuthenticatedInviteRoute
+  '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
+  '/console/team': typeof AuthenticatedConsoleTeamRoute
+  '/console/': typeof AuthenticatedConsoleIndexRoute
+  '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/invite': typeof AuthenticatedInviteRoute
+  '/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
+  '/console/team': typeof AuthenticatedConsoleTeamRoute
+  '/console': typeof AuthenticatedConsoleIndexRoute
+  '/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/console': typeof AuthenticatedConsoleRouteWithChildren
+  '/_authenticated/invite': typeof AuthenticatedInviteRoute
+  '/_authenticated/console/integrations': typeof AuthenticatedConsoleIntegrationsRoute
+  '/_authenticated/console/team': typeof AuthenticatedConsoleTeamRoute
+  '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
+  '/_authenticated/console/issues/$issueId': typeof AuthenticatedConsoleIssuesIssueIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/console'
+    | '/invite'
+    | '/console/integrations'
+    | '/console/team'
+    | '/console/'
+    | '/console/issues/$issueId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/invite'
+    | '/console/integrations'
+    | '/console/team'
+    | '/console'
+    | '/console/issues/$issueId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/console'
+    | '/_authenticated/invite'
+    | '/_authenticated/console/integrations'
+    | '/_authenticated/console/team'
+    | '/_authenticated/console/'
+    | '/_authenticated/console/issues/$issueId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +160,108 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/console': {
+      id: '/_authenticated/console'
+      path: '/console'
+      fullPath: '/console'
+      preLoaderRoute: typeof AuthenticatedConsoleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/invite': {
+      id: '/_authenticated/invite'
+      path: '/invite'
+      fullPath: '/invite'
+      preLoaderRoute: typeof AuthenticatedInviteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/': {
+      id: '/_authenticated/console/'
+      path: '/'
+      fullPath: '/console/'
+      preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
+      parentRoute: typeof AuthenticatedConsoleRoute
+    }
+    '/_authenticated/console/integrations': {
+      id: '/_authenticated/console/integrations'
+      path: '/integrations'
+      fullPath: '/console/integrations'
+      preLoaderRoute: typeof AuthenticatedConsoleIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedConsoleRoute
+    }
+    '/_authenticated/console/team': {
+      id: '/_authenticated/console/team'
+      path: '/team'
+      fullPath: '/console/team'
+      preLoaderRoute: typeof AuthenticatedConsoleTeamRouteImport
+      parentRoute: typeof AuthenticatedConsoleRoute
+    }
+    '/_authenticated/console/issues/$issueId': {
+      id: '/_authenticated/console/issues/$issueId'
+      path: '/issues/$issueId'
+      fullPath: '/console/issues/$issueId'
+      preLoaderRoute: typeof AuthenticatedConsoleIssuesIssueIdRouteImport
+      parentRoute: typeof AuthenticatedConsoleRoute
+    }
   }
 }
 
+interface AuthenticatedConsoleRouteChildren {
+  AuthenticatedConsoleIntegrationsRoute: typeof AuthenticatedConsoleIntegrationsRoute
+  AuthenticatedConsoleTeamRoute: typeof AuthenticatedConsoleTeamRoute
+  AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
+  AuthenticatedConsoleIssuesIssueIdRoute: typeof AuthenticatedConsoleIssuesIssueIdRoute
+}
+
+const AuthenticatedConsoleRouteChildren: AuthenticatedConsoleRouteChildren = {
+  AuthenticatedConsoleIntegrationsRoute: AuthenticatedConsoleIntegrationsRoute,
+  AuthenticatedConsoleTeamRoute: AuthenticatedConsoleTeamRoute,
+  AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
+  AuthenticatedConsoleIssuesIssueIdRoute:
+    AuthenticatedConsoleIssuesIssueIdRoute,
+}
+
+const AuthenticatedConsoleRouteWithChildren =
+  AuthenticatedConsoleRoute._addFileChildren(AuthenticatedConsoleRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedConsoleRoute: typeof AuthenticatedConsoleRouteWithChildren
+  AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedConsoleRoute: AuthenticatedConsoleRouteWithChildren,
+  AuthenticatedInviteRoute: AuthenticatedInviteRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
